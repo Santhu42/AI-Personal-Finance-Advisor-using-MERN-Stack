@@ -3,13 +3,9 @@
 // ===============================
 import dotenv from "dotenv";
 dotenv.config();
-console.log("OPENAI KEY:", process.env.OPENAI_API_KEY);
-
 
 console.log("🔑 OPENAI KEY LOADED:", !!process.env.OPENAI_API_KEY);
-
-
-console.log("🔥 RUNNING THIS index.js FILE 🔥");
+console.log("🔥 RUNNING index.js 🔥");
 
 // ===============================
 // Imports
@@ -22,7 +18,7 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import transactionRoutes from "./routes/transactions.js";
 import uploadRoutes from "./routes/upload.js";
-import aiRoutes from "./routes/ai.js"; // 🤖 AI insights route
+import aiRoutes from "./routes/ai.js";
 
 // Middleware
 import authMiddleware from "./middleware/auth.js";
@@ -33,9 +29,23 @@ import authMiddleware from "./middleware/auth.js";
 const app = express();
 
 // ===============================
-// Global Middlewares
+// CORS CONFIG (🔥 CRITICAL FIX)
 // ===============================
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://ai-personal-finance-advisor-using-mern-stack.netlify.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+  })
+);
+
+// Handle preflight requests
+app.options("*", cors());
+
 app.use(express.json());
 
 // ===============================
@@ -43,9 +53,7 @@ app.use(express.json());
 // ===============================
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB Connected Successfully");
-  })
+  .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => {
     console.error("❌ MongoDB Connection Error:", err.message);
     process.exit(1);
@@ -54,17 +62,9 @@ mongoose
 // ===============================
 // Routes
 // ===============================
-
-// Auth routes
 app.use("/auth", authRoutes);
-
-// Transactions routes (JWT protected inside)
 app.use("/transactions", transactionRoutes);
-
-// CSV upload route (JWT protected inside upload.js)
 app.use("/upload", uploadRoutes);
-
-// 🤖 AI insights routes (budget suggestions, saving tips)
 app.use("/ai", aiRoutes);
 
 // Health check
@@ -72,7 +72,7 @@ app.get("/", (req, res) => {
   res.send("Backend working with MongoDB");
 });
 
-// Debug upload test route
+// Upload test
 app.get("/upload-test", (req, res) => {
   res.send("UPLOAD ROUTE IS REACHABLE");
 });
@@ -89,7 +89,6 @@ app.get("/profile", authMiddleware, (req, res) => {
 // Start Server
 // ===============================
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

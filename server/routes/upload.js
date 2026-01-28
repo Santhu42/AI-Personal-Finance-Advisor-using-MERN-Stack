@@ -9,19 +9,20 @@ import auth from "../middleware/auth.js";
 const router = express.Router();
 
 // ===============================
-// Ensure uploads folder exists
+// Ensure uploads directory exists
 // ===============================
 const uploadDir = path.join(process.cwd(), "uploads");
 
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 // ===============================
-// Multer Configuration
+// Multer configuration
 // ===============================
 const upload = multer({
-  dest: uploadDir
+  dest: uploadDir,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
 // ===============================
@@ -30,7 +31,7 @@ const upload = multer({
 // ===============================
 router.post("/", auth, upload.single("file"), async (req, res) => {
   console.log("📥 /upload hit");
-  console.log("📄 file:", req.file);
+  console.log("📄 file:", req.file?.originalname);
 
   try {
     if (!req.file) {
@@ -39,19 +40,16 @@ router.post("/", auth, upload.single("file"), async (req, res) => {
 
     const rows = await csv().fromFile(req.file.path);
 
-    // ===============================
-    // Normalize + validate rows
-    // ===============================
     const transactions = rows
-      .filter(row => row.description && row.amount) // skip empty rows
+      .filter(row => row.description && row.amount)
       .map(row => ({
         userId: req.user.id,
         date: row.date ? new Date(row.date) : new Date(),
         description: row.description.trim(),
-        amount: Number(row.amount), // 🔥 ENSURE NUMBER
+        amount: Number(row.amount),
         category: row.category ? row.category.trim() : "Uncategorized"
       }))
-      .filter(t => !isNaN(t.amount)); // skip invalid numbers
+      .filter(t => !isNaN(t.amount));
 
     if (transactions.length === 0) {
       fs.unlinkSync(req.file.path);
@@ -60,9 +58,7 @@ router.post("/", auth, upload.single("file"), async (req, res) => {
 
     await Transaction.insertMany(transactions);
 
-    // ===============================
     // Cleanup uploaded file
-    // ===============================
     fs.unlinkSync(req.file.path);
 
     res.json({
@@ -70,7 +66,7 @@ router.post("/", auth, upload.single("file"), async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ CSV ERROR:", err);
+    console.error("❌ CSV upload error:", err);
 
     if (req.file?.path && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
