@@ -1,13 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 function AIInsights({ transactions, summary }) {
   const [insights, setInsights] = useState([]);
 
-  useEffect(() => {
-    generateInsights();
-  }, [transactions, summary]);
-
-  const generateInsights = () => {
+  const generateInsights = useCallback(() => {
     const rules = [];
 
     if (!transactions || transactions.length === 0) {
@@ -18,7 +14,7 @@ function AIInsights({ transactions, summary }) {
 
     // 1️⃣ Highest spending category
     const categoryTotals = {};
-    transactions.forEach(t => {
+    transactions.forEach((t) => {
       if (t.amount < 0) {
         categoryTotals[t.category] =
           (categoryTotals[t.category] || 0) + Math.abs(t.amount);
@@ -26,7 +22,7 @@ function AIInsights({ transactions, summary }) {
     });
 
     const highestCategory = Object.keys(categoryTotals).reduce(
-      (a, b) => categoryTotals[a] > categoryTotals[b] ? a : b,
+      (a, b) => (categoryTotals[a] > categoryTotals[b] ? a : b),
       Object.keys(categoryTotals)[0]
     );
 
@@ -59,7 +55,11 @@ function AIInsights({ transactions, summary }) {
     }
 
     setInsights(rules);
-  };
+  }, [transactions, summary]);
+
+  useEffect(() => {
+    generateInsights();
+  }, [generateInsights]);
 
   return (
     <div style={{ padding: "15px", border: "1px solid #ccc", marginTop: "20px" }}>

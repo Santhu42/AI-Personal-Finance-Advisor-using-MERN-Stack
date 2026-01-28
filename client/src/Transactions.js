@@ -160,7 +160,7 @@ function Transactions() {
   // ===============================
   useEffect(() => {
     refreshAll();
-  }, []);
+  }, [refreshAll]);
 
   return (
     <div>
