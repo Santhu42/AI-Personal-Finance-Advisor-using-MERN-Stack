@@ -1,9 +1,10 @@
-import { useEffect, useState , useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import UploadCSV from "./UploadCSV";
 import CategoryChart from "./CategoryChart";
 import AIInsights from "./AIInsights";
 
-const API = "http://localhost:5000";
+// ✅ Use deployed backend (NOT localhost)
+const API = "https://ai-personal-finance-advisor-using-mern-stack.onrender.com";
 
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -16,7 +17,7 @@ function Transactions() {
   const [summary, setSummary] = useState({
     income: 0,
     expense: 0,
-    balance: 0
+    balance: 0,
   });
 
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ function Transactions() {
   // ===============================
   // HANDLE JWT EXPIRY
   // ===============================
-  const handleAuthError = (res) => {
+  const handleAuthError = useCallback((res) => {
     if (res.status === 401 || res.status === 403) {
       alert("Session expired. Please login again.");
       localStorage.removeItem("token");
@@ -33,15 +34,15 @@ function Transactions() {
       return true;
     }
     return false;
-  };
+  }, []);
 
   // ===============================
   // FETCH TRANSACTIONS
   // ===============================
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const res = await fetch(`${API}/transactions`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (handleAuthError(res)) return;
@@ -51,15 +52,15 @@ function Transactions() {
     } catch (err) {
       console.error("Fetch transactions failed", err);
     }
-  };
+  }, [token, handleAuthError]);
 
   // ===============================
   // FETCH SUMMARY
   // ===============================
-  const fetchSummary = async () => {
+  const fetchSummary = useCallback(async () => {
     try {
       const res = await fetch(`${API}/transactions/summary`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (handleAuthError(res)) return;
@@ -69,15 +70,15 @@ function Transactions() {
     } catch (err) {
       console.error("Fetch summary failed", err);
     }
-  };
+  }, [token, handleAuthError]);
 
   // ===============================
   // FETCH CATEGORY ANALYTICS
   // ===============================
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch(`${API}/transactions/categories`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (handleAuthError(res)) return;
@@ -87,7 +88,23 @@ function Transactions() {
     } catch (err) {
       console.error("Fetch categories failed", err);
     }
-  };
+  }, [token, handleAuthError]);
+
+  // ===============================
+  // REFRESH ALL DATA (STABLE)
+  // ===============================
+  const refreshAll = useCallback(() => {
+    fetchTransactions();
+    fetchSummary();
+    fetchCategories();
+  }, [fetchTransactions, fetchSummary, fetchCategories]);
+
+  // ===============================
+  // LOAD DATA ON PAGE LOAD
+  // ===============================
+  useEffect(() => {
+    refreshAll();
+  }, [refreshAll]);
 
   // ===============================
   // ADD TRANSACTION
@@ -105,13 +122,13 @@ function Transactions() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           description,
           amount: Number(amount),
-          category
-        })
+          category,
+        }),
       });
 
       if (handleAuthError(res)) return;
@@ -135,7 +152,7 @@ function Transactions() {
     try {
       const res = await fetch(`${API}/transactions/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (handleAuthError(res)) return;
@@ -146,30 +163,11 @@ function Transactions() {
     }
   };
 
-  // ===============================
-  // REFRESH ALL DATA
-  // ===============================
-const refreshAll = useCallback(() => {
-  fetchTransactions();
-  fetchSummary();
-  fetchCategories();
-}, [fetchTransactions, fetchSummary, fetchCategories]);
-
-
-  // ===============================
-  // LOAD DATA ON PAGE LOAD
-  // ===============================
-  useEffect(() => {
-    refreshAll();
-  }, [refreshAll]);
-
   return (
     <div>
       <h2>Transactions</h2>
 
-      {/* ===============================
-          SUMMARY DASHBOARD
-         =============================== */}
+      {/* SUMMARY */}
       <div style={{ padding: "10px", border: "1px solid #ccc", marginBottom: "20px" }}>
         <h3>Summary</h3>
         <p>Income: ₹{summary.income}</p>
@@ -177,42 +175,34 @@ const refreshAll = useCallback(() => {
         <p><b>Balance: ₹{summary.balance}</b></p>
       </div>
 
-      {/* ===============================
-          CATEGORY CHART
-         =============================== */}
+      {/* CATEGORY CHART */}
       <CategoryChart data={categories} />
 
-      {/* ===============================
-          AI INSIGHTS (🔥 NEW)
-         =============================== */}
+      {/* AI INSIGHTS */}
       <AIInsights transactions={transactions} summary={summary} />
 
-      {/* ===============================
-          CSV UPLOAD
-         =============================== */}
+      {/* CSV UPLOAD */}
       <UploadCSV onUploadSuccess={refreshAll} />
 
-      {/* ===============================
-          ADD TRANSACTION
-         =============================== */}
+      {/* ADD TRANSACTION */}
       <div style={{ marginBottom: "20px" }}>
         <input
           placeholder="Description"
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
         />
 
         <input
           placeholder="Amount (use - for expense)"
           type="number"
           value={amount}
-          onChange={e => setAmount(e.target.value)}
+          onChange={(e) => setAmount(e.target.value)}
         />
 
         <input
           placeholder="Category"
           value={category}
-          onChange={e => setCategory(e.target.value)}
+          onChange={(e) => setCategory(e.target.value)}
         />
 
         <button onClick={addTransaction} disabled={loading}>
@@ -220,11 +210,9 @@ const refreshAll = useCallback(() => {
         </button>
       </div>
 
-      {/* ===============================
-          TRANSACTION LIST
-         =============================== */}
+      {/* TRANSACTION LIST */}
       <ul>
-        {transactions.map(t => (
+        {transactions.map((t) => (
           <li key={t._id}>
             {t.description} | ₹{t.amount} | {t.category}
             <button
