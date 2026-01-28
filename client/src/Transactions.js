@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState , useCallback } from "react";
 import UploadCSV from "./UploadCSV";
 import CategoryChart from "./CategoryChart";
 import AIInsights from "./AIInsights";
@@ -149,11 +149,12 @@ function Transactions() {
   // ===============================
   // REFRESH ALL DATA
   // ===============================
-  const refreshAll = () => {
-    fetchTransactions();
-    fetchSummary();
-    fetchCategories();
-  };
+const refreshAll = useCallback(() => {
+  fetchTransactions();
+  fetchSummary();
+  fetchCategories();
+}, [fetchTransactions, fetchSummary, fetchCategories]);
+
 
   // ===============================
   // LOAD DATA ON PAGE LOAD
