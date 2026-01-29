@@ -32,7 +32,8 @@ function UploadCSV({ onUploadSuccess }) {
       }
 
       alert(data.message || "CSV uploaded successfully");
-      if (onUploadSuccess) onUploadSuccess();
+      window.location.reload();
+
 
     } catch (err) {
       console.error("❌ Upload error:", err);

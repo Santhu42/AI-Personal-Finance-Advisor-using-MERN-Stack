@@ -9,7 +9,7 @@ function Login({ onLogin }) {
     try {
       const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
-      onLogin();
+      window.location.href = "/";
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
