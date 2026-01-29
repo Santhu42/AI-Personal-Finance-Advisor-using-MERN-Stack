@@ -1,14 +1,18 @@
 # 💰 AI Personal Finance Advisor (MERN Stack)
 
-A full-stack web application built using the **MERN stack** that helps users understand and manage their personal finances.  
+A full-stack web application built using the **MERN stack** that helps users understand and manage their personal finances.
+
 Users can upload bank statements or manually add transactions, visualize spending patterns, and receive **AI-powered financial insights** such as category breakdowns, budget suggestions, and saving tips.
 
 ---
 
 ## 🚀 Live Demo
 
-- **Frontend:** https://ai-personal-finance-advisor.vercel.app  
-- **Backend API:** https://ai-finance-backend.onrender.com  
+- **Frontend (Netlify)**  
+  👉 https://vermillion-monstera-be6f4a.netlify.app
+
+- **Backend API (Render)**  
+  👉 https://ai-personal-finance-advisor-using-mern-usuh.onrender.com
 
 ---
 
@@ -26,13 +30,13 @@ Users can upload bank statements or manually add transactions, visualize spendin
 - Express.js
 - MongoDB (Mongoose)
 - JWT Authentication
-- Multer (File Uploads)
+- Multer (CSV File Uploads)
 - OpenAI API (AI Insights)
 
 ### Deployment
-- Frontend: Vercel
-- Backend: Render
-- Database: MongoDB Atlas
+- **Frontend:** Netlify  
+- **Backend:** Render  
+- **Database:** MongoDB Atlas  
 
 ---
 
@@ -170,7 +174,7 @@ OpenAI API
 
 MongoDB Atlas
 
-Render & Vercel
+Render & Netlify
 
 Chart.js
 
