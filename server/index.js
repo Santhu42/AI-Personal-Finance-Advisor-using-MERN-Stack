@@ -35,7 +35,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://vermillion-monstera-be6f4a.netlify.app/"
+      "https://vermillion-monstera-be6f4a.netlify.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
