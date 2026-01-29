@@ -5,27 +5,33 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const register = async () => {
+  const handleRegister = async () => {
     try {
       await api.post("/auth/register", { email, password });
-      alert("Registered! Now login.");
-    } catch {
-      alert("Registration failed");
+      alert("Registration successful. Please login.");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div>
       <h2>Register</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-      <br /><br />
+
       <input
-        type="password"
-        placeholder="Password"
-        onChange={e => setPassword(e.target.value)}
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
-      <br /><br />
-      <button onClick={register}>Register</button>
+
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <button onClick={handleRegister}>Register</button>
     </div>
   );
 }

@@ -1,65 +1,38 @@
 import { useState } from "react";
 import api from "./api";
 
-function Login() {
+function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const login = async () => {
-    if (!email || !password) {
-      alert("Please enter email and password");
-      return;
-    }
-
+  const handleLogin = async () => {
     try {
-      setLoading(true);
-
-      const res = await api.post("/auth/login", {
-        email,
-        password
-      });
-
-      // Save JWT token
+      const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
-
-      alert("Login successful 🎉");
-
-      // Reload app to show Transactions
-      window.location.reload();
-
+      onLogin();
     } catch (err) {
-      alert(err?.response?.data?.msg || "Login failed");
-    } finally {
-      setLoading(false);
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div>
       <h2>Login</h2>
 
       <input
-        type="email"
         placeholder="Email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
       />
-
-      <br /><br />
 
       <input
-        type="password"
         placeholder="Password"
+        type="password"
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br /><br />
-
-      <button onClick={login} disabled={loading}>
-        {loading ? "Logging in..." : "Login"}
-      </button>
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 }
