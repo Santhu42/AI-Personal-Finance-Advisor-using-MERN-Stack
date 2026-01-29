@@ -15,7 +15,7 @@ function UploadCSV({ onUploadSuccess }) {
 
     try {
       const res = await fetch(
-        "https://ai-personal-finance-advisor-using-mern-stack.onrender.com/upload",
+        "https://ai-personal-finance-advisor-using-mern-usuh.onrender.com/upload",
         {
           method: "POST",
           headers: {

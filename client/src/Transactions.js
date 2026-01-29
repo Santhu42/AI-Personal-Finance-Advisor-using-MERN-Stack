@@ -4,7 +4,7 @@ import CategoryChart from "./CategoryChart";
 import AIInsights from "./AIInsights";
 
 // ✅ Use deployed backend (NOT localhost)
-const API = "https://ai-personal-finance-advisor-using-mern-stack.onrender.com";
+const API = "https://ai-personal-finance-advisor-using-mern-usuh.onrender.com/";
 
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
