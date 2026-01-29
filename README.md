@@ -155,7 +155,7 @@ AI-assisted financial decision making
 
 Expense prediction using ML
 
-Multi-currency support
+Multi-currency Support
 
 Export reports as PDF
 
